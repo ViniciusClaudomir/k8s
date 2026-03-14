@@ -5,7 +5,7 @@ metadata:
   namespace: redis-ha
 spec:
   serviceName: redis-replica
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: redis
