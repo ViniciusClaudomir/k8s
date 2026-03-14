@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: manager
-  namespace: manager
+  name: artifact-registry
+  namespace: artifact-registry
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: manager
+    name: artifact-registry
   minReplicas: 1
   maxReplicas: 10
   metrics:
