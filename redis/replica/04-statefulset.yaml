@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-replica
+  namespace: redis-ha
+spec:
+  serviceName: redis-replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: replica
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: replica
+    spec:
+      # Garante que a replica só suba após o master estar respondendo
+      initContainers:
+        - name: wait-for-master
+          image: redis:7-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until redis-cli \
+                -h redis-master-0.redis-master.redis-ha.svc.cluster.local \
+                -a redis@HA2024 ping 2>/dev/null | grep -q PONG; do
+                echo "Aguardando master ficar disponivel..."
+                sleep 3
+              done
+              echo "Master disponivel. Iniciando replica."
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "/etc/redis/redis.conf"]
+          ports:
+            - containerPort: 6379
+              name: redis
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis/redis.conf
+              subPath: redis.conf
+            - name: redis-data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "-a", "redis@HA2024", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "-a", "redis@HA2024", "ping"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-replica-config
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

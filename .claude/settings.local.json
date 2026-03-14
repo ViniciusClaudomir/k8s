@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl delete pod redis-sentinel-0 redis-sentinel-1 -n redis-ha)",
+      "Bash(kubectl get pods -n redis-ha)"
+    ]
+  }
+}

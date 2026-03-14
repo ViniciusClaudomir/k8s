@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel
+  namespace: redis-ha
+  labels:
+    app: redis
+    role: sentinel
+spec:
+  # ClusterIP: clientes usam este serviço para consultar o master atual
+  # Ex: redis-cli -h redis-sentinel.redis-ha.svc.cluster.local -p 26379 sentinel get-master-addr-by-name mymaster
+  type: ClusterIP
+  ports:
+    - port: 26379
+      targetPort: 26379
+      name: sentinel
+  selector:
+    app: redis
+    role: sentinel

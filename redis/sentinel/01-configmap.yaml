@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-sentinel-config
+  namespace: redis-ha
+data:
+  sentinel.conf: |
+    port 26379
+    protected-mode no
+    loglevel notice
+
+    # Monitora o master — quorum 2 significa que ambos sentinels precisam concordar
+    # NOTA: Em produção, recomenda-se 3 sentinels com quorum 2 (maioria)
+    sentinel monitor mymaster redis-master-0.redis-master.redis-ha.svc.cluster.local 6379 2
+    sentinel auth-pass mymaster redis@HA2024
+
+    # Tempo (ms) sem resposta para declarar o nó como subjetivamente down
+    sentinel down-after-milliseconds mymaster 300
+
+    # Timeout máximo para o processo de failover
+    sentinel failover-timeout mymaster 900
+
+    # Número de replicas sincronizadas em paralelo após um failover
+    sentinel parallel-syncs mymaster 1

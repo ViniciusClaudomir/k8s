@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-sentinel
+  namespace: redis-ha
+spec:
+  serviceName: redis-sentinel
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis
+      role: sentinel
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: sentinel
+    spec:
+      # O Sentinel reescreve o sentinel.conf em runtime ao detectar failover.
+      # O initContainer copia o arquivo do ConfigMap (read-only) para um
+      # volume emptyDir (gravável) antes de iniciar o container principal.
+      initContainers:
+        - name: init-sentinel
+          image: redis:7-alpine
+          command:
+            - sh
+            - -c
+            - |
+              MASTER_HOST="redis-master-0.redis-master.redis-ha.svc.cluster.local"
+
+              # Aguarda o master responder antes de iniciar
+              until redis-cli -h "$MASTER_HOST" -a redis@HA2024 ping 2>/dev/null | grep -q PONG; do
+                echo "Aguardando master ficar disponivel..."
+                sleep 3
+              done
+
+              # Resolve o IP do master — o Redis Sentinel 7 nao aceita hostname
+              # no sentinel.conf e falha com "Can't resolve instance hostname"
+              # se o DNS nao responder no momento exato do parse do config.
+              # Usando o IP resolvido aqui, o sentinel sobe de forma confiavel.
+              # Apos um failover, o sentinel reescreve o proprio config com o novo IP.
+              MASTER_IP=$(getent hosts "$MASTER_HOST" | awk '{print $1}')
+              echo "Master IP resolvido: $MASTER_IP"
+
+              cp /tmp/sentinel-ro/sentinel.conf /etc/redis/sentinel.conf
+              sed -i "s/$MASTER_HOST/$MASTER_IP/g" /etc/redis/sentinel.conf
+              chmod 666 /etc/redis/sentinel.conf
+              echo "Configuracao pronta. Iniciando sentinel..."
+          volumeMounts:
+            - name: sentinel-config-ro
+              mountPath: /tmp/sentinel-ro
+            - name: sentinel-config-rw
+              mountPath: /etc/redis
+      containers:
+        - name: sentinel
+          image: redis:7-alpine
+          command: ["redis-sentinel", "/etc/redis/sentinel.conf"]
+          ports:
+            - containerPort: 26379
+              name: sentinel
+          volumeMounts:
+            - name: sentinel-config-rw
+              mountPath: /etc/redis
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "-p", "26379", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "-p", "26379", "ping"]
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
+      volumes:
+        - name: sentinel-config-ro
+          configMap:
+            name: redis-sentinel-config
+            items:
+              - key: sentinel.conf
+                path: sentinel.conf
+        - name: sentinel-config-rw
+          emptyDir: {}
