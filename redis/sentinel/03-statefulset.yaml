@@ -5,7 +5,7 @@ metadata:
   namespace: redis-ha
 spec:
   serviceName: redis-sentinel
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: redis
