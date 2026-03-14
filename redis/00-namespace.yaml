@@ -4,3 +4,4 @@ metadata:
   name: redis-ha
   labels:
     app: redis
+    istio-injection: enabled
