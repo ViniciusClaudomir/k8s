@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: executor
-  namespace: executor
+  name: manager
+  namespace: manager
   labels:
-    app: executor
+    app: manager
 spec:
   selector:
     matchLabels:
-      app: executor
+      app: manager
   template:
     metadata:
       labels:
-        app: executor
+        app: manager
     spec:
       containers:
-        - name: executor
-          image: executor:20260314-v2
+        - name: manager
+          image: manager:v1
           imagePullPolicy: Never
           ports:
             - containerPort: 5000

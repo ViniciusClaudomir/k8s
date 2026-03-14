@@ -1,10 +1,10 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: executor
-  namespace: executor
+  name: manager
+  namespace: manager
 spec:
-  host: executor.executor.svc.cluster.local
+  host: manager.manager.svc.cluster.local
   trafficPolicy:
     connectionPool:
       http:

@@ -81,23 +81,23 @@ spec:
 
 ---
 
-# --- Executor ---
+# --- Manager ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: executor
+  name: manager
   namespace: argocd
   labels:
-    app.kubernetes.io/part-of: executor
+    app.kubernetes.io/part-of: manager
 spec:
   project: default
   source:
     repoURL: https://github.com/ViniciusClaudomir/k8s.git
     targetRevision: main
-    path: executor
+    path: manager
   destination:
     server: https://kubernetes.default.svc
-    namespace: executor
+    namespace: manager
   syncPolicy:
     automated:
       prune: true
