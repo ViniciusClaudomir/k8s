@@ -104,3 +104,28 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
+
+# --- artifact-registry ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: artifact-registry
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: artifact-registry
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: artifact-registry
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: artifact-registry
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

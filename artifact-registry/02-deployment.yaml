@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artifact-registry
+  namespace: artifact-registry
+  labels:
+    app: artifact-registry
+spec:
+  selector:
+    matchLabels:
+      app: artifact-registry
+  template:
+    metadata:
+      labels:
+        app: artifact-registry
+    spec:
+      containers:
+        - name: artifact-registry
+          image: artifact-registry:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
