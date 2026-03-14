@@ -78,3 +78,29 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
+---
+
+# --- Executor ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: executor
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: executor
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: executor
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: executor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
