@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: executor
+  namespace: executor
+spec:
+  host: executor.executor.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50

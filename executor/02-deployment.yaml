@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  namespace: executor
+  labels:
+    app: executor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: executor
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          image: executor:20260314
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: EXECUTOR_URL
+              value: ""  # preencha com o valor correto
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
