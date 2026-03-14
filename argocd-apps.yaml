@@ -1,0 +1,80 @@
+# =============================================================================
+# ArgoCD Applications — Redis HA
+# Aplica com: kubectl apply -f argocd-apps.yaml
+# =============================================================================
+
+# --- Redis Master ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-master
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: redis-ha
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: redis/master
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis-ha
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+
+# --- Redis Replica ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-replica
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: redis-ha
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: redis/replica
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis-ha
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+---
+
+# --- Redis Sentinel ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-sentinel
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: redis-ha
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: redis/sentinel
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis-ha
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
