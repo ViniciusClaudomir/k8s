@@ -129,3 +129,28 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
+
+# --- submit ---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: submit
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: submit
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ViniciusClaudomir/k8s.git
+    targetRevision: main
+    path: submit
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: submit
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

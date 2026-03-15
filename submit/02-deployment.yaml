@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: submit
+  namespace: submit
+  labels:
+    app: submit
+spec:
+  selector:
+    matchLabels:
+      app: submit
+  template:
+    metadata:
+      labels:
+        app: submit
+    spec:
+      containers:
+        - name: submit
+          image: submit:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5001
+              name: http
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5001
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
