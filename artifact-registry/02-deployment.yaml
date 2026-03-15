@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: artifact-registry
-          image: artifact-registry:v2
+          image: artifact-registry:v3
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
