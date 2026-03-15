@@ -1,0 +1,91 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: operator-routing
+  namespace: manager
+spec:
+  workloadSelector:
+    labels:
+      app: manager
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_OUTBOUND
+        listener:
+          portNumber: 5001
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+              subFilter:
+                name: envoy.filters.http.router
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.lua
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+            inline_code: |
+              -- estado de módulo: persiste entre requests no mesmo worker do Envoy
+              local bloom = {}
+
+              local REGISTRY_CLUSTER   = "outbound|8080||artifact-registry.artifact-registry.svc.cluster.local"
+              local REGISTRY_AUTHORITY = "artifact-registry.artifact-registry.svc.cluster.local"
+              local TIMEOUT_MS         = 3000
+
+              local function registry_get(handle, path)
+                local ok, headers, body = pcall(function()
+                  return handle:httpCall(
+                    REGISTRY_CLUSTER,
+                    {
+                      [":method"]    = "GET",
+                      [":path"]      = path,
+                      [":authority"] = REGISTRY_AUTHORITY
+                    },
+                    "",
+                    TIMEOUT_MS
+                  )
+                end)
+                if not ok then return nil, nil end
+                return headers, body
+              end
+
+              local STABLE_RANDOM = 0.1  -- mantém 10% aleatório após atingir o target
+
+              function envoy_on_request(handle)
+                local operator = handle:headers():get("operator")
+                if operator == nil or operator == "" then
+                  return
+                end
+
+                if not bloom[operator] then
+                  -- operador desconhecido: consulta registry uma vez
+                  local headers, body = registry_get(handle, "/lookup?artifact=" .. operator)
+
+                  if headers ~= nil and headers[":status"] == "200"
+                      and body ~= nil and body ~= "" then
+                    bloom[operator] = true
+                    handle:headers():replace("x-envoy-upstream-host", body)
+                  end
+                  -- 404: nenhum pod tem ainda, pod que receber vai se registrar depois
+                  return
+                end
+
+                -- operador conhecido: ajusta espalhamento pela ratio atual
+                local headers, body = registry_get(handle, "/lookup?artifact=" .. operator)
+
+                if headers == nil or headers[":status"] ~= "200"
+                    or body == nil or body == "" then
+                  -- pod sumiu: remove do bloom para re-checar na próxima
+                  bloom[operator] = nil
+                  return
+                end
+
+                local ratio         = tonumber(headers["x-spread-ratio"]  or "1.0")
+                local spread_target = tonumber(headers["x-spread-target"] or "0.3")
+                local random_rate   = math.max(STABLE_RANDOM, spread_target - ratio)
+
+                if math.random() >= random_rate then
+                  handle:headers():replace("x-envoy-upstream-host", body)
+                end
+                -- else: roteamento normal (espalha o operator ou mantém 10% de escape)
+              end
