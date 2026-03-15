@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: manager
-          image: manager:v01
+          image: manager:v02
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
