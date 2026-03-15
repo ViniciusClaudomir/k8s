@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: manager-to-registry
+  namespace: manager
+spec:
+  hosts:
+    - artifact-registry.artifact-registry.svc.cluster.local
+  http:
+    - retries:
+        attempts: 3
+        perTryTimeout: 5s
+        retryOn: connect-failure,reset,503,504
+      route:
+        - destination:
+            host: artifact-registry.artifact-registry.svc.cluster.local
+            port:
+              number: 8080

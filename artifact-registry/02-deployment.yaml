@@ -6,6 +6,7 @@ metadata:
   labels:
     app: artifact-registry
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: artifact-registry
@@ -14,9 +15,10 @@ spec:
       labels:
         app: artifact-registry
     spec:
+      serviceAccountName: artifact-registry
       containers:
         - name: artifact-registry
-          image: artifact-registry:v3
+          image: artifact-registry:v4
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
