@@ -23,7 +23,7 @@ spec:
               name: http
           env:
             - name: EXECUTOR_URL
-              value: "http://submit.submit.svc.cluster.local"  # preencha com o valor correto
+              value: "http://submit.submit.svc.cluster.local:5001"  # preencha com o valor correto
           resources:
             requests:
               memory: "128Mi"
