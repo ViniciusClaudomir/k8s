@@ -22,7 +22,7 @@ spec:
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
-              value: "0.3"
+              value: "0.25"
           ports:
             - containerPort: 8080
               name: http
