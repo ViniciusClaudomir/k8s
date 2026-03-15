@@ -16,8 +16,11 @@ spec:
     spec:
       containers:
         - name: artifact-registry
-          image: artifact-registry:v1
+          image: artifact-registry:v2
           imagePullPolicy: Never
+          env:
+            - name: SPREAD_TARGET
+              value: "0.3"
           ports:
             - containerPort: 8080
               name: http
