@@ -18,11 +18,11 @@ spec:
       serviceAccountName: artifact-registry
       containers:
         - name: artifact-registry
-          image: artifact-registry:v001
+          image: artifact-registry:v002s
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
-              value: "0.25"
+              value: "0.5"
           ports:
             - containerPort: 8080
               name: http
