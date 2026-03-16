@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: manager
-          image: manager:v03
+          image: manager:v04
           imagePullPolicy: Never
           ports:
             - containerPort: 5000
@@ -26,10 +26,10 @@ spec:
               value: "http://artifact-registry.artifact-registry.svc.cluster.local:8080"
           resources:
             requests:
-              memory: "500Mi"
+              memory: "128Mi"
               cpu: "100m"
             limits:
-              memory: "800Mi"
+              memory: "256Mi"
               cpu: "500m"
           readinessProbe:
             httpGet:
