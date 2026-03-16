@@ -26,10 +26,10 @@ spec:
               value: "http://artifact-registry.artifact-registry.svc.cluster.local:8080"
           resources:
             requests:
-              memory: "128Mi"
+              memory: "500Mi"
               cpu: "100m"
             limits:
-              memory: "256Mi"
+              memory: "800Mi"
               cpu: "500m"
           readinessProbe:
             httpGet:
