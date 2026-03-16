@@ -1,0 +1,45 @@
+# Redis roda sem sidecar Istio — desabilita mTLS do lado do cliente
+# para os três services do Redis dentro do namespace artifact-registry.
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-master-notls
+  namespace: artifact-registry
+spec:
+  host: redis-master.artifact-registry.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-master-svc-notls
+  namespace: artifact-registry
+spec:
+  host: redis-master-svc.artifact-registry.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-sentinel-notls
+  namespace: artifact-registry
+spec:
+  host: redis-sentinel.artifact-registry.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-replica-notls
+  namespace: artifact-registry
+spec:
+  host: redis-replica.artifact-registry.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE

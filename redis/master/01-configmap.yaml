@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis-master-config
-  namespace: redis-ha
+  namespace: artifact-registry
 data:
   redis.conf: |
     bind 0.0.0.0

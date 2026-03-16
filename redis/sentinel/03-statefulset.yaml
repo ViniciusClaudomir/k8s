@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis-sentinel
-  namespace: redis-ha
+  namespace: artifact-registry
 spec:
   serviceName: redis-sentinel
   replicas: 2
@@ -15,6 +15,8 @@ spec:
       labels:
         app: redis
         role: sentinel
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       # O Sentinel reescreve o sentinel.conf em runtime ao detectar failover.
       # O initContainer copia o arquivo do ConfigMap (read-only) para um
@@ -26,7 +28,7 @@ spec:
             - sh
             - -c
             - |
-              MASTER_HOST="redis-master-0.redis-master.redis-ha.svc.cluster.local"
+              MASTER_HOST="redis-master-0.redis-master.artifact-registry.svc.cluster.local"
 
               # Aguarda o master responder antes de iniciar
               until redis-cli -h "$MASTER_HOST" -a redis@HA2024 ping 2>/dev/null | grep -q PONG; do

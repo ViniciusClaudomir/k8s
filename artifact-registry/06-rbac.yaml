@@ -4,6 +4,7 @@ metadata:
   name: artifact-registry
   namespace: artifact-registry
 ---
+# Leitura de pods no namespace submit (descoberta de pods ativos)
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -26,4 +27,28 @@ subjects:
 roleRef:
   kind: Role
   name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# Leitura de métricas de pods (CPU/memória via metrics-server)
+# Requer ClusterRole pois metrics.k8s.io é uma API de cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: artifact-registry-metrics-reader
+rules:
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: artifact-registry-metrics-reader
+subjects:
+  - kind: ServiceAccount
+    name: artifact-registry
+    namespace: artifact-registry
+roleRef:
+  kind: ClusterRole
+  name: artifact-registry-metrics-reader
   apiGroup: rbac.authorization.k8s.io

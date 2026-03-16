@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis-replica
-  namespace: redis-ha
+  namespace: artifact-registry
 spec:
   serviceName: redis-replica
   replicas: 2
@@ -15,6 +15,8 @@ spec:
       labels:
         app: redis
         role: replica
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       # Garante que a replica só suba após o master estar respondendo
       initContainers:
@@ -25,7 +27,7 @@ spec:
             - -c
             - |
               until redis-cli \
-                -h redis-master-0.redis-master.redis-ha.svc.cluster.local \
+                -h redis-master-0.redis-master.artifact-registry.svc.cluster.local \
                 -a redis@HA2024 ping 2>/dev/null | grep -q PONG; do
                 echo "Aguardando master ficar disponivel..."
                 sleep 3
