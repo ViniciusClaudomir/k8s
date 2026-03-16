@@ -22,7 +22,7 @@ spec:
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
-              value: "0.5"
+              value: "1.0"
             - name: REDIS_SENTINEL_ADDR
               value: "redis-sentinel.artifact-registry.svc.cluster.local:26379"
             - name: REDIS_MASTER_NAME
