@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: submit
-          image: submit:v5
+          image: submit:v6
           imagePullPolicy: Never
           ports:
             - containerPort: 5001

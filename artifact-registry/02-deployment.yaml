@@ -18,7 +18,7 @@ spec:
       serviceAccountName: artifact-registry
       containers:
         - name: artifact-registry
-          image: artifact-registry:v003
+          image: artifact-registry:v004
           imagePullPolicy: Never
           env:
             - name: SPREAD_TARGET
