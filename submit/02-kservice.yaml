@@ -9,8 +9,10 @@ spec:
       annotations:
         autoscaling.knative.dev/minScale: "0"
         autoscaling.knative.dev/maxScale: "4"
-        autoscaling.knative.dev/metric: "cpu"
-        autoscaling.knative.dev/target: "70"
+        autoscaling.knative.dev/class: "kpa.autoscaler.knative.dev"
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/rps-target: "50"
     spec:
       containers:
         - name: submit
@@ -19,11 +21,6 @@ spec:
           ports:
             - containerPort: 5001
               name: h2c
-          env:
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
           resources:
             requests:
               memory: "128Mi"
