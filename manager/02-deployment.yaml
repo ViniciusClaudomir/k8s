@@ -23,7 +23,7 @@ spec:
               name: http
           env:
             - name: EXECUTOR_URL
-              value: "http://artifact-registry.artifact-registry.svc.cluster.local:8080"
+              value: "http://submit.submit.svc.cluster.local"
             - name: SUBMIT_URL
               value: "http://submit.submit.svc.cluster.local"
           resources:
