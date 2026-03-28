@@ -6,8 +6,9 @@ metadata:
 spec:
   template:
     metadata:
+      name: submit-base
       annotations:
-        autoscaling.knative.dev/min-scale: "0"
+        autoscaling.knative.dev/min-scale: "1"
         autoscaling.knative.dev/max-scale: "4"
         autoscaling.knative.dev/metric: "concurrency"
         autoscaling.knative.dev/target: "10"
@@ -32,12 +33,15 @@ spec:
               path: /health
               port: 5001
             initialDelaySeconds: 10
+            timeoutSeconds: 1
             periodSeconds: 10
+            successThreshold: 1
             failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /health
               port: 5001
             initialDelaySeconds: 20
+            timeoutSeconds: 1
             periodSeconds: 20
             failureThreshold: 3

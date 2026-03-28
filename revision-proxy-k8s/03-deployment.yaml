@@ -18,7 +18,7 @@ spec:
       serviceAccountName: revision-proxy
       containers:
         - name: revision-proxy
-          image: revision-proxy:v1
+          image: revision-proxy:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
