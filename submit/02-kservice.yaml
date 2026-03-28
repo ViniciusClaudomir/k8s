@@ -11,6 +11,7 @@ spec:
         autoscaling.knative.dev/max-scale: "4"
         autoscaling.knative.dev/metric: "concurrency"
         autoscaling.knative.dev/target: "10"
+        autoscaling.knative.dev/scale-to-zero-pod-retention-period: "10s"
     spec:
       containers:
         - name: submit
