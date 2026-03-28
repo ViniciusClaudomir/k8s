@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: revision-proxy
+  namespace: revision-proxy
+  labels:
+    app: revision-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: revision-proxy
+  template:
+    metadata:
+      labels:
+        app: revision-proxy
+    spec:
+      serviceAccountName: revision-proxy
+      containers:
+        - name: revision-proxy
+          image: revision-proxy:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20

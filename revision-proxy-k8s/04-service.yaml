@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: revision-proxy
+  namespace: revision-proxy
+  labels:
+    app: revision-proxy
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  selector:
+    app: revision-proxy
