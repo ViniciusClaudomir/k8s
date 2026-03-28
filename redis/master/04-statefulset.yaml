@@ -5,7 +5,7 @@ metadata:
   namespace: artifact-registry
 spec:
   serviceName: redis-master
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: redis

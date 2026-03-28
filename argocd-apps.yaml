@@ -105,6 +105,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 
+---
 
 # --- artifact-registry ---
 apiVersion: argoproj.io/v1alpha1
@@ -130,6 +131,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 
+---
 
 # --- submit ---
 apiVersion: argoproj.io/v1alpha1
