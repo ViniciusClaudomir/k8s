@@ -33,16 +33,16 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: revision-proxy
+  name: revision-proxy-k8s
   namespace: argocd
   labels:
-    app.kubernetes.io/part-of: revision-proxy
+    app.kubernetes.io/part-of: revision-proxy-k8s
 spec:
   project: default
   source:
     repoURL: https://github.com/ViniciusClaudomir/k8s.git
     targetRevision: main
-    path: revision-proxy/k8s
+    path: revision-proxy-k8s
   destination:
     server: https://kubernetes.default.svc
     namespace: revision-proxy
