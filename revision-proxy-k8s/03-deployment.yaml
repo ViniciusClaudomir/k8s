@@ -18,11 +18,20 @@ spec:
       serviceAccountName: revision-proxy
       containers:
         - name: revision-proxy
-          image: revision-proxy:v2
+          image: rp:v1
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
               name: http
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_FIELD
+              value: "operator"
+            - name: OPERATOR_PROTO_FIELD
+              value: "5"
           resources:
             requests:
               memory: "64Mi"

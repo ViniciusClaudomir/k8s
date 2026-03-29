@@ -15,7 +15,33 @@ rules:
     verbs: ["get", "patch"]
   - apiGroups: ["serving.knative.dev"]
     resources: ["revisions"]
-    verbs: ["get", "list"]
+    verbs: ["get", "list", "delete"]
+---
+---
+# Permissão para leader election via Lease no próprio namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: revision-proxy-leader
+  namespace: revision-proxy
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: revision-proxy-leader
+  namespace: revision-proxy
+subjects:
+  - kind: ServiceAccount
+    name: revision-proxy
+    namespace: revision-proxy
+roleRef:
+  kind: Role
+  name: revision-proxy-leader
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
